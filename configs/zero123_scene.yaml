@@ -1,0 +1,238 @@
+name: "zero123"
+tag: "${data.random_camera.height}_${rmspace:${basename:${data.image_path}},_}_prog${data.random_camera.progressive_until}"
+exp_root_dir: "outputs"
+seed: 0
+
+data_type: "single-image-datamodule"
+data: # threestudio/data/image.py -> SingleImageDataModuleConfig
+  image_path: /tmp/input_image_rgba.png
+  height: [128, 256]
+  width: [128, 256]
+  resolution_milestones: [2000]
+  default_elevation_deg: 20.0
+  default_azimuth_deg: 0.0
+  default_camera_distance: 1.0
+  default_fovy_deg: 48.9183
+  requires_depth: ${cmaxgt0orcmaxgt0:${system.loss.lambda_depth},${system.loss.lambda_depth_rel}}
+  requires_normal: ${cmaxgt0:${system.loss.lambda_normal}}
+  n_aux_c2w: 0
+
+  view_synthesis:
+    dataset: "DTU"
+    scene_uid: 8
+    scale: 2.02
+    rescale: True
+    rescale_mode: "manual"
+    manual_gt_to_pred_scale: 1.
+    input_view_idx: 0
+    quantize: False
+    excluded_views: []
+
+  random_camera: # threestudio/data/uncond.py -> RandomCameraDataModuleConfig
+    height: [128, 256]
+    width: [128, 256]
+    batch_size: [6, 1]
+    resolution_milestones: [2000]
+    eval_height: 256
+    eval_width: 256
+    eval_batch_size: 1
+    elevation_range: [5, 80]
+    azimuth_range: [-180, 180]
+    camera_distance_range: [.8, 1.8]
+    fovy_range: [48.9183, 48.9183] # Zero123 has fixed fovy
+    progressive_until: 1000
+    camera_perturb: 0.0
+    center_perturb: 0.0
+    up_perturb: 0.0
+    light_position_perturb: 1.0
+    light_distance_range: [7.5, 10.0]
+    eval_elevation_deg: ${data.default_elevation_deg}
+    eval_camera_distance: ${data.default_camera_distance}
+    eval_fovy_deg: ${data.default_fovy_deg}
+    light_sample_strategy: "dreamfusion"
+    batch_uniform_azimuth: False
+    n_val_views: 240
+    n_test_views: 120
+
+
+system_type: "zero123-system"
+system:
+  geometry_type: "implicit-volume"
+  geometry:
+    radius: 2.0
+    normal_type: "analytic"
+
+    # the density initialization proposed in the DreamFusion paper
+    # does not work very well
+    # density_bias: "blob_dreamfusion"
+    # density_activation: exp
+    # density_blob_scale: 5.
+    # density_blob_std: 0.2
+
+    # use Magic3D density initialization instead
+    density_bias: "blob_magic3d"
+    density_activation: softplus
+    density_blob_scale: 5.
+    density_blob_std: 0.5
+
+    # coarse to fine hash grid encoding
+    # to ensure smooth analytic normals
+    pos_encoding_config:
+      otype: HashGrid
+      n_levels: 16
+      n_features_per_level: 2
+      log2_hashmap_size: 19
+      base_resolution: 16
+      per_level_scale: 1.447269237440378 # max resolution 4096
+    mlp_network_config:
+      otype: "VanillaMLP"
+      activation: "ReLU"
+      output_activation: "none"
+      n_neurons: 32
+      n_hidden_layers: 2
+
+  material_type: "diffuse-with-point-light-material"
+  material:
+    ambient_only_steps: 100000
+    textureless_prob: 0.05
+    albedo_activation: sigmoid
+
+  # background_type: "neural-environment-map-background"
+  # background:
+  #   color_activation: sigmoid
+
+  # background_type: "neural-environment-map-background" # unused
+  background_type: "solid-color-background" # unused
+  background:
+    color: [0.5, 0.5, 0.5]
+    learned: False
+    random_aug: true
+    random_aug_prob: 1.0
+
+
+  renderer_type: "nerf-volume-renderer"
+  renderer:
+    radius: ${system.geometry.radius}
+    # num_samples_per_ray: 512
+    return_comp_normal: True
+    # return_normal_perturb: ${gt0:${system.loss.lambda_3d_normal_smooth}}
+    estimator: proposal  # one of occgrid, importance, proposal
+    near_plane: 0.25
+
+    # for some reason large far planes are prone to nan
+    # maybe due to half precision?
+    far_plane: 100.
+    # used if estimator=importance
+    sampling_type: lindisp
+    num_samples_per_ray: 64
+    num_samples_per_ray_importance: 32
+
+    ## proposal
+    # num_samples_per_ray: 32
+    num_samples_per_ray_proposal: 64
+    # near_plane: 0.1
+    # far_plane: 4.0
+    proposal_network_config:
+      n_input_dims: 3
+      n_output_dims: 1
+      encoding_config:
+        otype: HashGrid
+        n_levels: 5
+        n_features_per_level: 2
+        log2_hashmap_size: 17
+        base_resolution: 16
+        per_level_scale: 1.681792830507429 # max_resolution: 128
+      network_config:
+        otype: VanillaMLP
+        activation: ReLU
+        output_activation: none
+        n_neurons: 64
+        n_hidden_layers: 1
+    prop_optimizer_config:
+      name: Adam
+      args:
+        lr: .005
+        eps: 1.0e-15
+        weight_decay: 1.0e-6
+    # prop_scheduler_config:
+    #   name: ChainedScheduler
+    #   schedulers:
+    #     - name: LinearLR
+    #       args:
+    #         start_factor: 0.01
+    #         total_iters: 100
+
+  prompt_processor_type: "dummy-prompt-processor" # Zero123 doesn't use prompts
+  prompt_processor:
+    pretrained_model_name_or_path: ""
+    prompt: ""
+
+  guidance_type: "zero123-guidance"
+  guidance:
+    # pretrained_model_name_or_path: "/home/jupyter/objaverse_6dof_5000.ckpt"
+    pretrained_model_name_or_path: "/home/jupyter/threestudio/load/zero123/zero123-7dof-fov.ckpt"
+    pretrained_config: "/home/jupyter/threestudio/load/zero123/2023-07-25T05-55-47-project.yaml"
+    vram_O: False
+    p_use_aux_cameras: [0, 1., 0., 2000]
+    cond_image_path: /tmp/input_image_guidance_rgba.png
+    cond_elevation_deg: ${data.default_elevation_deg}
+    cond_azimuth_deg: ${data.default_azimuth_deg}
+    cond_camera_distance: ${data.default_camera_distance}
+    guidance_scale: 7.5
+    guidance_scale_aux: ${system.guidance.guidance_scale}
+    precomputed_scale: .7
+    # min_step_percent: 0.02
+    min_step_percent: [0,.75,.02,1000]
+    # min_step_percent: [0, 0.4, 0.2, 200]  # (start_iter, start_val, end_val, end_iter)
+    # max_step_percent: 0.98
+    max_step_percent: [1000, 0.98, 0.025, 2500]
+
+    depth_threshold_for_anchor_guidance: 0.
+
+  freq:
+    # ref_or_zero123: "alternate"
+    # n_ref: 2
+    ref_only_steps: 0
+    guidance_eval: 0
+
+  loggers:
+    wandb:
+      enable: false
+      project: "threestudio"
+      name: None
+
+  loss:
+    lambda_sds: 0.1
+    lambda_clip: 0.
+    lambda_rgb: 1500.
+    lambda_mask: 0.
+    lambda_depth: 0. # 0.05
+    lambda_depth_rel: 0. # [0, 0, 0.05, 100]
+    lambda_normal: 0. # [0, 0, 0.05, 100]
+    lambda_normal_smooth: 8.0
+    lambda_3d_normal_smooth: 0.0
+    lambda_orient: 5.0
+    lambda_distortion: 0.0
+    lambda_sparsity: 0.0 # should be tweaked for every model
+    # tries to enforce that surfaces should be sharp
+    lambda_opaque: 0.0
+
+  optimizer:
+    name: Adam
+    args:
+      lr: 0.005
+      betas: [0.9, 0.99]
+      eps: 1.e-8
+
+trainer:
+  max_steps: 4000
+  log_every_n_steps: 1
+  num_sanity_val_steps: 0
+  val_check_interval: 1000
+  enable_progress_bar: true
+  precision: 16-mixed
+
+checkpoint:
+  save_last: true # save at each validation time
+  save_top_k: -1
+  every_n_train_steps: 100 # ${trainer.max_steps}

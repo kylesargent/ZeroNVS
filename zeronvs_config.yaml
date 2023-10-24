@@ -1,0 +1,155 @@
+model:
+  base_learning_rate: 0.0001
+  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    linear_start: 0.00085
+    linear_end: 0.012
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    first_stage_key: image_target
+    cond_stage_key: image_cond
+    image_size: 32
+    channels: 4
+    cond_stage_trainable: false
+    conditioning_key: hybrid
+    monitor: val/loss_simple_ema
+    scale_factor: 0.18215
+    conditioning_config:
+      params:
+        mode: 7dof_quantile_scale
+        embedding_dim: 19
+        depth_model_name: midas
+    scheduler_config:
+      target: ldm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps:
+        - 100
+        cycle_lengths:
+        - 10000000000000
+        f_start:
+        - 1.0e-06
+        f_max:
+        - 1.0
+        f_min:
+        - 1.0
+    unet_config:
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 32
+        in_channels: 8
+        out_channels: 4
+        model_channels: 320
+        attention_resolutions:
+        - 4
+        - 2
+        - 1
+        num_res_blocks: 2
+        channel_mult:
+        - 1
+        - 2
+        - 4
+        - 4
+        num_heads: 8
+        use_spatial_transformer: true
+        transformer_depth: 1
+        context_dim: 768
+        use_checkpoint: true
+        legacy: false
+    eval_config:
+      params:
+        scale: 3.0
+        ddim_steps: 100
+        ddim_eta: 1.0
+        lpips_model_path: null
+    first_stage_config:
+      target: ldm.models.autoencoder.AutoencoderKL
+      params:
+        embed_dim: 4
+        monitor: val/rec_loss
+        ddconfig:
+          double_z: true
+          z_channels: 4
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+          - 1
+          - 2
+          - 4
+          - 4
+          num_res_blocks: 2
+          attn_resolutions: []
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.FrozenCLIPImageEmbedder
+data:
+  target: ldm.data.simple.WDSGenericDataModule
+  params:
+    train_config:
+      batch_size: 48
+      num_workers: 6
+      shuffle_buffer_size: 500
+      prefetch_factor: 4
+      dataset_config_1:
+        dataset_n_shards: 127
+        dataset_name: co3d
+        views_per_scene: 100
+        dataset_n_scenes: 18432
+        rate: 0.025
+        probability: 0.34
+        dataset_url: null
+      dataset_config_2:
+        dataset_n_shards: 127
+        dataset_name: re10k
+        views_per_scene: 200
+        dataset_n_scenes: 65280
+        probability: 0.33
+        rate: 0.025
+        dataset_url: null
+      dataset_config_3:
+        dataset_n_shards: 127
+        dataset_name: acid
+        views_per_scene: 100
+        dataset_n_scenes: 12032
+        probability: 0.33
+        rate: 0.025
+        dataset_url: null
+    val_config:
+      batch_size: 4
+      subsample: 1.0
+      scene_scale: 1.0
+      dataset_n_shards: 1
+      dataset_name: co3d
+      dataset_n_scenes: 150
+      num_workers: 1
+      shuffle_buffer_size: 20
+      rate: 0.1
+      dataset_url: null
+--lightning:
+  trainer:
+    accumulate_grad_batches: 4
+  modelcheckpoint:
+    params:
+      every_n_train_steps: 2500
+--data:
+  params:
+    train_config:
+      batch_size: 48
+    val_config:
+      batch_size: 4
+--model:
+  params:
+    conditioning_config:
+      params:
+        mode: 7dof_quantile_scale
+        embedding_dim: 19
+    eval_config:
+      params:
+        ddim_steps: 100
+  base_learning_rate: 0.0001
+--args:
+  finetune_from: null
