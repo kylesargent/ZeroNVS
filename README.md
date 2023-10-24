@@ -1,6 +1,6 @@
 # Introduction
 
-## [Webpage (with video results)]() | [Paper]()
+## [Webpage (with video results)](https://kylesargent.github.io/zeronvs/) | [Paper]()
 
 This is the offical code release for ZeroNVS: Zero-shot 360-degree View Synthesis from a Single Real Image. 
 
@@ -9,8 +9,8 @@ This is the offical code release for ZeroNVS: Zero-shot 360-degree View Synthesi
 ### What is in this repository: 3D SDS distillation code, evaluation code, trained models
 In this repository, we currently provide code to reproduce our main evaluations and also to run ZeroNVS to distill NeRFs from your own images. This includes scripts to reproduce the main metrics on DTU and Mip-NeRF 360 datasets. 
 
-### Coming soon: Diffusion model training documentation and data setup scripts
-As part of ZeroNVS, we implement a high-performance dataloader in WebDataset for multiview data. This allows us to shard and stream data efficiently from large datasets such as our mixture dataset (CO3D, ACID, and RealEstate10K). All the code is already released in `zeronvs_diffusion`, but is not documented and somewhat entangled with our internal data representations. We will shortly provide additional documentation and scripts for setting up your own massive sharded multiview datasets.
+### How do I train my own diffusion models?
+Check out the companion repository, https://github.com/kylesargent/zeronvs_diffusion.
 
 # Acknowledgement
 
@@ -34,6 +34,8 @@ pip install -r requirements-zeronvs.txt
 pip install -f https://nerfacc-bucket.s3.us-west-2.amazonaws.com/whl/torch-2.0.0_cu118.html
 ```
 
+Finally, be sure to initialize and pull the code in the `zeronvs_diffusion` submodule.
+
 # Data and models
 Since we have experimented with a variety of datasets in ZeroNVS, the codebase consumes a few different types of data formats. 
 
@@ -42,6 +44,8 @@ To download all the relevant data and models, you can run the following commands
 gdown --fuzzy https://drive.google.com/file/d/1q0oMpp2Vy09-0LA-JXpo_ZoX2PH5j8oP/view?usp=sharing
 gdown --fuzzy https://drive.google.com/file/d/1aTSmJa8Oo2qCc2Ce2kT90MHEA6UTSBKj/view?usp=drive_link
 gdown --fuzzy https://drive.google.com/file/d/17WEMfs2HABJcdf4JmuIM3ti0uz37lSZg/view?usp=sharing
+
+unzip dtu_dataset.zip
 ```
 
 ## MipNeRF360 dataset
@@ -61,7 +65,7 @@ Evaluation is performed by distilling a NeRF for each of the scenes in the datas
 
 Note that you can still achieve good performance with much faster config options; for instance, reduced resolution, batch size, number of training steps, or some combination. The code as-is is just intended to reproduce the results from the paper.
 
-After downloading the data and models, you can run the evals via either `launch_eval_dtu.sh` or `launch_eval_mipnerf360`.
+After downloading the data and models, you can run the evals via either `launch_eval_dtu.sh` or `launch_eval_mipnerf360`. The metrics for each scene will be saved in `metrics.json` files which you must average to get the final performance. 
 
 We provide the expected performance for individual scenes in the tables below. Note that there is some randomness inherent in SDS distillation, so you may not get exactly these numbers (though the performance should be quite close, especially on average).
 
@@ -108,11 +112,11 @@ If you use ZeroNVS, please cite via:
     and Li, Zizhang
     and Shah, Tanmay
     and Herrmann, Charles
-    and Yu, Koven
+    and Yu, Hong-Xing
     and Zhang, Yunzhi
     and Chan, Eric Ryan
     and Lagun, Dmitry
-    and Li, Fei-Fei
+    and Fei-Fei, Li
     and Sun, Deqing
     and Wu, Jiajun}        
     title = {ZeroNVS: Zero-shot 360-degree View Synthesis from a Single Real Image},
