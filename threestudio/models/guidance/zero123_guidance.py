@@ -22,7 +22,7 @@ import copy
 import sys
 
 sys.path.insert(
-    0, "/home/jupyter/enter_the_photo_image2nerf/enter_the_photo_diffusion/zero123"
+    0, "zeronvs_diffusion/zero123"
 )
 
 from ldm.data import common
