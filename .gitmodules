@@ -1,6 +1,3 @@
-[submodule "enter_the_photo_diffusion"]
-	path = enter_the_photo_diffusion
-	url = git@github.com:kylesargent/enter_the_photo_diffusion.git
 [submodule "zeronvs_diffusion"]
 	path = zeronvs_diffusion
 	url = git@github.com:kylesargent/zeronvs_diffusion.git

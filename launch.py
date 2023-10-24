@@ -112,7 +112,7 @@ def main(args, extras) -> None:
     pl.seed_everything(cfg.seed + get_rank(), workers=True)
 
     submodule_path = (
-        "/home/jupyter/enter_the_photo_image2nerf/enter_the_photo_diffusion/zero123"
+        "zeronvs_diffusion/zero123"
     )
     assert os.path.exists(submodule_path)
     sys.path.insert(0, submodule_path)

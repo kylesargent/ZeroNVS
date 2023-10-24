@@ -20,10 +20,11 @@ import copy
 
 
 import sys
-
-sys.path.insert(
-    0, "zeronvs_diffusion/zero123"
+submodule_path = (
+    "zeronvs_diffusion/zero123"
 )
+assert os.path.exists(submodule_path)
+sys.path.insert(0, submodule_path)
 
 from ldm.data import common
 

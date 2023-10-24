@@ -10,7 +10,7 @@ This is the offical code release for ZeroNVS: Zero-shot 360-degree View Synthesi
 In this repository, we currently provide code to reproduce our main evaluations and also to run ZeroNVS to distill NeRFs from your own images. This includes scripts to reproduce the main metrics on DTU and Mip-NeRF 360 datasets. 
 
 ### Coming soon: Diffusion model training documentation and data setup scripts
-As part of ZeroNVS, we implement a high-performance dataloader in WebDataset for multiview data. This allows us to shard and stream data efficiently from large datasets such as our mixture dataset (CO3D, ACID, and RealEstate10K). All the code is already released in `enter_the_photo_diffusion`, but is not documented and somewhat entangled with our internal data representations. We will shortly provide additional documentation and scripts for setting up your own massive sharded multiview datasets.
+As part of ZeroNVS, we implement a high-performance dataloader in WebDataset for multiview data. This allows us to shard and stream data efficiently from large datasets such as our mixture dataset (CO3D, ACID, and RealEstate10K). All the code is already released in `zeronvs_diffusion`, but is not documented and somewhat entangled with our internal data representations. We will shortly provide additional documentation and scripts for setting up your own massive sharded multiview datasets.
 
 # Acknowledgement
 
@@ -34,8 +34,15 @@ pip install -r requirements-zeronvs.txt
 pip install -f https://nerfacc-bucket.s3.us-west-2.amazonaws.com/whl/torch-2.0.0_cu118.html
 ```
 
-# Data
+# Data and models
 Since we have experimented with a variety of datasets in ZeroNVS, the codebase consumes a few different types of data formats. 
+
+To download all the relevant data and models, you can run the following commands within the zeronvs conda environment 
+```
+gdown --fuzzy https://drive.google.com/file/d/1q0oMpp2Vy09-0LA-JXpo_ZoX2PH5j8oP/view?usp=sharing
+gdown --fuzzy https://drive.google.com/file/d/1aTSmJa8Oo2qCc2Ce2kT90MHEA6UTSBKj/view?usp=drive_link
+gdown --fuzzy https://drive.google.com/file/d/17WEMfs2HABJcdf4JmuIM3ti0uz37lSZg/view?usp=sharing
+```
 
 ## MipNeRF360 dataset
 You can download it [here](https://drive.google.com/file/d/1q0oMpp2Vy09-0LA-JXpo_ZoX2PH5j8oP/view?usp=sharing). Be sure to set the appropriate path in `resources.py`
@@ -46,7 +53,7 @@ Download it [here](https://drive.google.com/file/d/1aTSmJa8Oo2qCc2Ce2kT90MHEA6UT
 ## Your own images
 Store them as 256x256 png images and pass them to `launch_inference.sh` (details below).
 
-# Models
+## Models
 We release our main model, trained with our $\mathbf{M}_{\mathrm{6DoF+1,~viewer}}$ parameterization on CO3D, RealEstate10K, and ACID. You can download it [here](https://drive.google.com/file/d/17WEMfs2HABJcdf4JmuIM3ti0uz37lSZg/view?usp=sharing). We use this one model for all our main results.
 
 # Inference
