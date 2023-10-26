@@ -19,7 +19,13 @@ This codebase is heavily built off existing codebases for 3D-aware diffusion mod
 # Requirements
 The code has been tested on an A100 GPU with 40GB of memory.
 
-To set up the environment, use the following sequence of commands (disclaimer: the exact setup that will work for you might be platform dependent):
+To get the code:
+```
+git clone https://github.com/kylesargent/zeronvs.git
+cd zeronvs
+```
+
+To set up the environment, use the following sequence of commands. The exact setup that will work for you might be platform dependent. Note: it's normal for installing tiny-cuda-nn to take a long time.
 <!-- export TCNN_CUDA_ARCHITECTURES=80 -->
 
 ```
@@ -31,10 +37,16 @@ conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
 pip install ninja git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 
 pip install -r requirements-zeronvs.txt
-pip install -f https://nerfacc-bucket.s3.us-west-2.amazonaws.com/whl/torch-2.0.0_cu118.html
+pip install nerfacc -f https://nerfacc-bucket.s3.us-west-2.amazonaws.com/whl/torch-2.0.0_cu118.html
 ```
 
 Finally, be sure to initialize and pull the code in the `zeronvs_diffusion` submodule.
+```
+cd zeronvs_diffusion
+git submodule init
+git submodule update
+cd ..
+```
 
 # Data and models
 Since we have experimented with a variety of datasets in ZeroNVS, the codebase consumes a few different types of data formats. 
