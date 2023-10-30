@@ -1,6 +1,6 @@
 # Introduction
 
-## [Webpage (with video results)](https://kylesargent.github.io/zeronvs/) | [Paper]()
+## [Webpage (with video results)](https://kylesargent.github.io/zeronvs/) | [Paper](http://arxiv.org/abs/2310.17994)
 
 This is the offical code release for ZeroNVS: Zero-shot 360-degree View Synthesis from a Single Real Image. 
 
