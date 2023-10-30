@@ -1,8 +1,8 @@
-# Introduction
+# ZeroNVS
 
 ## [Webpage (with video results)](https://kylesargent.github.io/zeronvs/) | [Paper](http://arxiv.org/abs/2310.17994)
 
-This is the offical code release for ZeroNVS: Zero-shot 360-degree View Synthesis from a Single Real Image. 
+This is the offical code release for ZeroNVS: Zero-Shot 360-Degree View Synthesis from a Single Real Image. 
 
 ![teaser image](zeronvs_teaser.png "ZeroNVS results.")
 
@@ -118,20 +118,10 @@ Use the script `launch_inference.sh`. You will need to specify the image path, f
 # Citation
 If you use ZeroNVS, please cite via:
 ```
-@misc{zeronvs,
-  author = {
-    Sargent, Kyle
-    and Li, Zizhang
-    and Shah, Tanmay
-    and Herrmann, Charles
-    and Yu, Hong-Xing
-    and Zhang, Yunzhi
-    and Chan, Eric Ryan
-    and Lagun, Dmitry
-    and Fei-Fei, Li
-    and Sun, Deqing
-    and Wu, Jiajun}        
-    title = {ZeroNVS: Zero-shot 360-degree View Synthesis from a Single Real Image},
+@article{zeronvs,
+    author = {Sargent, Kyle and Li, Zizhang and Shah, Tanmay and Herrmann, Charles and Yu, Hong-Xing and Zhang, Yunzhi and Chan, Eric Ryan and Lagun, Dmitry and Fei-Fei, Li and Sun, Deqing and Wu, Jiajun},       
+    title = {{ZeroNVS}: Zero-Shot 360-Degree View Synthesis from a Single Real Image},
+    journal={arXiv preprint arXiv:2310.17994},
     year={2023}
-  }
+}
 ```
