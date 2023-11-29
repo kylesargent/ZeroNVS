@@ -92,6 +92,9 @@ def main(args, extras) -> None:
     from threestudio.utils.misc import get_rank
     from threestudio.utils.typing import Optional
 
+    from ldm.models.diffusion import options
+    options.LDM_DISTILLATION_ONLY = True
+
     logger = logging.getLogger("pytorch_lightning")
     if args.verbose:
         logger.setLevel(logging.DEBUG)
