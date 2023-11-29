@@ -18,14 +18,6 @@ from threestudio.utils.misc import C, parse_version
 from threestudio.utils.typing import *
 import copy
 
-
-import sys
-submodule_path = (
-    "zeronvs_diffusion/zero123"
-)
-assert os.path.exists(submodule_path)
-sys.path.insert(0, submodule_path)
-
 from ldm.data import common
 
 
