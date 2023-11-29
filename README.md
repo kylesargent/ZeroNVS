@@ -45,6 +45,11 @@ Finally, be sure to initialize and pull the code in the `zeronvs_diffusion` subm
 cd zeronvs_diffusion
 git submodule init
 git submodule update
+
+cd zero123
+pip install -e .
+cd ..
+
 cd ..
 ```
 
